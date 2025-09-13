@@ -47,8 +47,13 @@ file.get("/:id", async (c) => {
 		const upload = await findUploadByShareableLink(shareId);
 		if (!upload) return c.json({ message: "Could not find upload" }, 404);
 		const res = await getObject(upload.s3_link);
-		//somehow stream file to user
-		return c.json({ success: "true" });
+		if (!res.Body) {
+			return c.json({ message: "File not found" }, 404);
+		}
+		c.header("Content-Type", res.ContentType || "application/octet-stream");
+		c.header("Content-Disposition", "attachment");
+		const stream = res.Body as ReadableStream;
+		return c.body(stream);
 	} catch (err) {
 		console.error(err);
 		return c.json({ message: err instanceof Error ? err.message : err }, 500);
