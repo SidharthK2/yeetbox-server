@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { totalUsers } from "../repository/user-repository";
-import { redis } from "../redis";
+import { redis } from "../integrations/redis";
 
 export const health = new Hono();
 
