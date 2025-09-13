@@ -1,0 +1,21 @@
+{
+  "name": "yeetbox",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/pg": "^8.15.5"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "hono": "^4.9.7",
+    "ioredis": "^5.7.0",
+    "kysely": "^0.28.6",
+    "pg": "^8.16.3"
+  }
+}
