@@ -1,23 +1,23 @@
 import { db } from "../db/database";
 import type { UserUpdate, User, NewUser } from "../db/types";
 
-export async function findPersonById(id: number) {
+export async function findUserById(id: string) {
 	return await db
-		.selectFrom("user")
+		.selectFrom("users")
 		.where("id", "=", id)
 		.selectAll()
 		.executeTakeFirst();
 }
 
-export async function findPeople(criteria: Partial<User>) {
-	let query = db.selectFrom("user");
+export async function findUsers(criteria: Partial<User>) {
+	let query = db.selectFrom("users");
 
 	if (criteria.id) {
 		query = query.where("id", "=", criteria.id); // Kysely is immutable, you must re-assign!
 	}
 
-	if (criteria.bearerToken) {
-		query = query.where("bearerToken", "=", criteria.bearerToken);
+	if (criteria.bearer_token) {
+		query = query.where("bearer_token", "=", criteria.bearer_token);
 	}
 
 	if (criteria.created_at) {
@@ -27,22 +27,27 @@ export async function findPeople(criteria: Partial<User>) {
 	return await query.selectAll().execute();
 }
 
-export async function updatePerson(id: number, updateWith: UserUpdate) {
-	await db.updateTable("user").set(updateWith).where("id", "=", id).execute();
+export async function updateUser(id: string, updateWith: UserUpdate) {
+	await db.updateTable("users").set(updateWith).where("id", "=", id).execute();
 }
 
-export async function createPerson(person: NewUser) {
+export async function createUser(person: NewUser) {
 	return await db
-		.insertInto("user")
+		.insertInto("users")
 		.values(person)
 		.returningAll()
 		.executeTakeFirstOrThrow();
 }
 
-export async function deletePerson(id: number) {
+export async function deleteUser(id: string) {
 	return await db
-		.deleteFrom("user")
+		.deleteFrom("users")
 		.where("id", "=", id)
 		.returningAll()
 		.executeTakeFirst();
+}
+
+export async function totalUsers() {
+	const allUsers = await db.selectFrom("users").selectAll().execute();
+	return allUsers.length;
 }

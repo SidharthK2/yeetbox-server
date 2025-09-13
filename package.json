@@ -3,7 +3,9 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun run src/index.ts"
+    "dev": "bun --watch src/index.ts",
+    "migrate": "bun run src/db/scripts/migrate.ts",
+    "seed": "bun run src/db/scripts/seed.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",

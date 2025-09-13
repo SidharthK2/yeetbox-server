@@ -7,15 +7,28 @@ import type {
 } from "kysely";
 
 export interface Database {
-	user: UserTable;
+	users: UsersTable;
+	uploads: UploadsTable;
 }
 
-export interface UserTable {
-	id: Generated<number>;
-	bearerToken: string | null;
-	created_at: ColumnType<Date, string | undefined, never>;
+export interface UsersTable {
+	id: Generated<string>;
+	bearer_token: string;
+	created_at: Generated<ColumnType<Date, Date, never>>;
 }
 
-export type User = Selectable<UserTable>;
-export type NewUser = Insertable<UserTable>;
-export type UserUpdate = Updateable<UserTable>;
+export interface UploadsTable {
+	id: Generated<string>;
+	shareable_link: string;
+	s3_link: string;
+	ttl: Date;
+	uploader: string;
+}
+
+export type User = Selectable<UsersTable>;
+export type NewUser = Insertable<UsersTable>;
+export type UserUpdate = Updateable<UsersTable>;
+
+export type Upload = Selectable<UploadsTable>;
+export type NewUpload = Insertable<UploadsTable>;
+export type UploadUpdate = Updateable<UploadsTable>;

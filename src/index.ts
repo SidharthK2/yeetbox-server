@@ -1,7 +1,8 @@
 import { Hono } from "hono";
-const app = new Hono();
+import { health } from "./routes/health";
 
-app.get("/", (c) => c.text("Hono!"));
-console.log("Server running on port 3000");
+const app = new Hono();
+app.get("/", (c) => c.text("welcome to yeetbox!"));
+app.route("/health", health);
 
 export default app;
