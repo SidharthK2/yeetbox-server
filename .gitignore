@@ -173,3 +173,9 @@ dist
 
 # Finder (MacOS) folder config
 .DS_Store
+
+#certs
+ca.pem
+*.pem
+*.crt
+*.key
