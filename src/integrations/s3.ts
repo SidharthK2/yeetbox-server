@@ -1,8 +1,4 @@
-import {
-	S3Client,
-	PutObjectCommand,
-	GetObjectCommand,
-} from "@aws-sdk/client-s3";
+import {GetObjectCommand, PutObjectCommand, S3Client,} from "@aws-sdk/client-s3";
 
 export const BUCKET_URL =
 	"https://ejqkxtgweqyvrlvxrwpo.supabase.co/storage/v1/object/public/yeetbox-dev/";
@@ -34,11 +30,9 @@ export async function putObject(file: File) {
 
 export async function getObject(s3String: string) {
 	const s3Key = s3String.split("-dev/")[1];
-	console.log("extracted key: ", s3Key);
 	const command = new GetObjectCommand({
 		Bucket: "yeetbox-dev",
 		Key: s3Key,
 	});
-	const result = await s3Client.send(command);
-	return result;
+    return await s3Client.send(command);
 }

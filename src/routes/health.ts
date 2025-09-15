@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { totalUsers } from "../repository/user-repository";
-import { redis } from "../integrations/redis";
+import { client } from "../integrations/redis";
 
 export const health = new Hono();
 
@@ -9,7 +9,7 @@ health.get("/", async (c) => {
 	try {
 		await totalUsers();
 		statusString += "DB healthy ";
-		await redis.ping();
+		await client.ping();
 		statusString += "Redis healthy ";
 		return c.json({ database: statusString }, 200);
 	} catch (error) {

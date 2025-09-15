@@ -1,6 +1,7 @@
 import * as path from "node:path";
 import { Pool } from "pg";
 import { promises as fs } from "node:fs";
+import fsSync from "node:fs";
 import {
 	Kysely,
 	Migrator,
@@ -12,12 +13,15 @@ import type { Database } from "../types";
 async function migrateToLatest() {
 	const dialect = new PostgresDialect({
 		pool: new Pool({
-			database: "railway",
-			host: "trolley.proxy.rlwy.net",
-			user: "postgres",
+			user: "upadmin",
 			password: Bun.env.DB_PASSWORD,
-			port: 31455,
+			host: Bun.env.DB_HOST,
+			port: 11569,
+			database: "defaultdb",
 			max: 10,
+			ssl: {
+				ca: fsSync.readFileSync("./ca.pem").toString(),
+			},
 		}),
 	});
 	const db = new Kysely<Database>({
