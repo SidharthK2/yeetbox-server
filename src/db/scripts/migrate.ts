@@ -16,7 +16,7 @@ async function migrateToLatest() {
 			user: "upadmin",
 			password: Bun.env.DB_PASSWORD,
 			host: Bun.env.DB_HOST,
-			port: 11569,
+			port: 5432,
 			database: "defaultdb",
 			max: 10,
 		}),
