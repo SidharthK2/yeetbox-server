@@ -1,10 +1,10 @@
 version: '3.8'
 
 services:
+  # Your Yeetbox Application
   app:
     build: .
-    ports:
-      - "3000:3000"
+    restart: unless-stopped
     environment:
       - NODE_ENV=production
       - DB_HOST=db
@@ -17,22 +17,40 @@ services:
       - db
       - redis
 
+  # PostgreSQL Database Service
   db:
     image: postgres:15
+    restart: unless-stopped
     environment:
       - POSTGRES_USER=upadmin
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=defaultdb
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
 
+  # Redis Caching Service
   redis:
     image: redis:7
+    restart: unless-stopped
     volumes:
       - redis_data:/data
+
+  # Caddy Reverse Proxy Service
+  caddy:
+    build:
+      context: .
+      dockerfile: Dockerfile.caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+    environment:
+      - VERCEL_API_TOKEN=${VERCEL_API_TOKEN}
 
 volumes:
   postgres_data:
   redis_data:
+  caddy_data:
