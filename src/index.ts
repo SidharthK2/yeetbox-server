@@ -24,4 +24,7 @@ app.get("/", (c) => c.text("welcome to yeetbox!"));
 app.route("/health", health);
 app.route("/file", file);
 
-export default app;
+export default {
+	port: 3000,
+	fetch: app.fetch,
+};
