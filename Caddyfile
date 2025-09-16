@@ -1,0 +1,7 @@
+# Caddyfile
+api.sidk.dev {
+    tls {
+        dns vercel {env.VERCEL_API_TOKEN}
+    }
+    reverse_proxy app:3000
+}
