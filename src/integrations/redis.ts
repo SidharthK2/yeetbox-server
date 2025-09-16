@@ -1,16 +1,6 @@
 import { createClient } from "redis";
 import type { Upload } from "../db/types";
 
-// export const client = await createClient({
-// 	username: Bun.env.REDIS_USERNAME,
-// 	password: Bun.env.REDIS_PASSWORD,
-// 	socket: {
-// 		host: "redis-13667.c311.eu-central-1-1.ec2.redns.redis-cloud.com",
-// 		port: 13667,
-// 		tls: true,
-// 		timeout: 2000,
-// 	},
-// })
 export const client = await createClient({
 	url: Bun.env.REDIS_URL,
 })

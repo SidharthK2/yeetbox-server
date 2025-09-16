@@ -19,9 +19,6 @@ async function migrateToLatest() {
 			port: 11569,
 			database: "defaultdb",
 			max: 10,
-			ssl: {
-				ca: fsSync.readFileSync("./ca.pem").toString(),
-			},
 		}),
 	});
 	const db = new Kysely<Database>({

@@ -11,9 +11,6 @@ const dialect = new PostgresDialect({
 		port: 11569,
 		database: "defaultdb",
 		max: 10,
-		ssl: {
-			ca: fs.readFileSync("./ca.pem").toString(),
-		},
 	}),
 });
 export const db = new Kysely<Database>({
