@@ -7,6 +7,8 @@ export const client = await createClient({
 	socket: {
 		host: "redis-13667.c311.eu-central-1-1.ec2.redns.redis-cloud.com",
 		port: 13667,
+		tls: true,
+		timeout: 2000,
 	},
 })
 	.on("error", (err) => console.log("Redis Client Error", err))
