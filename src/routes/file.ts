@@ -10,6 +10,7 @@ import {
 	findUploadByShareableLink,
 } from "../repository/upload-repository";
 import {cacheUploadData, getCachedUploadData} from "../integrations/redis.ts";
+import {globalDownloadLimit, globalUploadLimit} from "../middleware/ratelimit.ts"
 
 type Variables = {
 	bearer_token: string;
@@ -17,17 +18,32 @@ type Variables = {
 
 export const file = new Hono<{ Variables: Variables }>();
 
-file.post("/upload", async (c) => {
+file.post("/upload", globalUploadLimit,  async (c) => {
 	try {
 		const token = c.get("bearer_token");
 		const {id: userId, bearer_token } = await findOrCreateUser(token);
 		setCookie(c, "bearer_token", bearer_token, { httpOnly: true });
 		const body = await c.req.parseBody();
-		const file = body.file as File;
+		const file = body.file
+
+        if (!file || !(file instanceof File)) {
+            return c.json({ error: "Valid file required" }, 400);
+        }
+        const MAX_SIZE = 50 * 1024 * 1024; // 50MB
+        const ALLOWED_TYPES = ['image/', 'application/pdf', 'text/', 'video/'];
+
+        if (file.size > MAX_SIZE) {
+            return c.json({ error: "File too large" }, 413);
+        }
+
+        if (!ALLOWED_TYPES.some(type => file.type.startsWith(type))) {
+            return c.json({ error: "File type not allowed" }, 415);
+        }
 		const id = crypto.randomUUID();
-		const { s3Key } = await putObject(file);
+		const putObjPromise = putObject(file);
+		const shareableLinkPromise = generateUniqueShareableLink (id);
+        const [{s3Key}, shareableLink] = await Promise.all([putObjPromise,shareableLinkPromise])
 		const s3Url = `${BUCKET_URL}${s3Key}`;
-		const shareableLink = await generateUniqueShareableLink (id);
         const uploadPayload = {
             id,
             shareable_link: shareableLink,
@@ -35,20 +51,34 @@ file.post("/upload", async (c) => {
             ttl: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
             uploader: userId,
         }
-		const uploadRecord = await createUpload(uploadPayload);
-        await cacheUploadData(shareableLink ,uploadPayload)
+        //Database + Cache in transaction pattern
+        const [uploadRecord] = await Promise.all([
+            createUpload(uploadPayload),
+            cacheUploadData(shareableLink, uploadPayload)
+        ]);
+
+        setCookie(c, "bearer_token", bearer_token, {
+            httpOnly: true,
+            secure: true, // HTTPS only
+            sameSite: 'strict'
+        });
 		return c.json({
 			success: true,
 			shareableLink: uploadRecord.shareable_link,
 			expiresAt: uploadRecord.ttl,
 		});
 	} catch (err) {
-		console.error(err);
-		return c.json({ success: "false" }, 500);
-	}
+        console.error('Upload failed:', {
+            error: err,
+            timestamp: new Date().toISOString(),
+        });
+        return c.json({
+            error: "Upload failed",
+        }, 500);
+    }
 });
 
-file.get("/:link", async (c) => {
+file.get("/:link", globalDownloadLimit, async (c) => {
 	try {
 		const shareLink = c.req.param("link");
         const cachedUpload = await getCachedUploadData(shareLink);

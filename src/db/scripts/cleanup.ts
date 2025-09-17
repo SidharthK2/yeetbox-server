@@ -4,15 +4,15 @@ import type { Database } from "../types";
 
 async function cleanupDatabase() {
 	const dialect = new PostgresDialect({
-		pool: new Pool({
-			database: "railway",
-			host: "trolley.proxy.rlwy.net",
-			user: "postgres",
-			password: Bun.env.DB_PASSWORD,
-			port: 31455,
-			max: 10,
-		}),
-	});
+        pool: new Pool({
+            user: "upadmin",
+            password: Bun.env.DB_PASSWORD,
+            host: Bun.env.DB_HOST,
+            port: 5432,
+            database: "defaultdb",
+            max: 10,
+        }),
+    });
 
 	const db = new Kysely<Database>({
 		dialect,
