@@ -93,6 +93,6 @@ export const globalDownloadLimit = globalRateLimitMiddleware({
 
 export const globalGeneralLimit = globalRateLimitMiddleware({
 	windowMs: 60 * 1000,
-	maxRequests: 10,
+	maxRequests: 1000,
 	keyName: "general",
 });
